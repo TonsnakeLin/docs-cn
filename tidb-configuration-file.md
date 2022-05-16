@@ -326,6 +326,12 @@ TiDB 配置文件比命令行参数支持更多的选项。你可以在 [config/
 + 控制 TiDB 启动时是否自动生成 TLS 证书。
 + 默认值：`false`
 
+### `tls-version`
+
++ 设置用于连接 MySQL 协议的最低 TLS 版本。
++ 默认值：""，支持 TLSv1.1 及以上版本。
++ 可选值：`"TLSv1.0"`、`"TLSv1.1"`、`"TLSv1.2"` 和 `"TLSv1.3"`
+
 ## performance
 
 性能相关配置。
@@ -342,8 +348,7 @@ TiDB 配置文件比命令行参数支持更多的选项。你可以在 [config/
 >
 > `server-memory-quota` 目前为实验性特性，不建议在生产环境中使用。
 
-+ tidb-server 实例内存的使用限制，单位为字节。<!-- 从 TiDB v5.0 起 -->该配置项完全取代原有的 [`max-memory`](https://docs.pingcap.com/zh/tidb/stable/tidb-configuration-file#max-memory)。
-
++ 设置 tidb-server 实例的最大内存用量，单位为字节。
 + 默认值：0
 + 默认值为 0 表示无内存限制。
 
@@ -462,7 +467,7 @@ TiDB 配置文件比命令行参数支持更多的选项。你可以在 [config/
 
 ## prepared-plan-cache
 
-prepare 语句的 plan cache 设置。
+prepare 语句的 [`plan cache`](/sql-prepared-plan-cache.md) 设置。
 
 ### `enabled`
 
@@ -477,7 +482,7 @@ prepare 语句的 plan cache 设置。
 
 ### `memory-guard-ratio`
 
-+ 用于防止超过 performance.max-memory, 超过 max-memory * (1 - prepared-plan-cache.memory-guard-ratio) 会剔除 LRU 中的元素。
++ 用于防止 prepare plan cache 的内存用量超过 performance.server-memory-quota。当 prepare plan cache 的内存用量超过 server-memory-quota * (1 - prepared-plan-cache.memory-guard-ratio) 时，TiDB 会剔除 LRU 中的元素。
 + 默认值：0.1
 + 最小值：0
 + 最大值：1
@@ -572,6 +577,12 @@ opentracing.reporter 相关的设置。
 + TiDB 与 TiKV 节点 rpc keepalive 检查的超时时间
 + 默认值：3
 + 单位：秒
+
+### `grpc-compression-type`
+
++ 控制 TiDB 向 TiKV 节点传输数据使用的压缩算法类型。默认值为 "none" 即不压缩。修改为 "gzip" 可以使用 gzip 算法压缩数据。
++ 默认值："none"
++ 可选值："none", "gzip"
 
 ### `commit-timeout`
 
@@ -671,20 +682,6 @@ TiDB 服务状态相关配置。
 + 输出与 database 相关的 QPS metrics 到 Prometheus 的开关。
 + 默认值：false
 
-## stmt-summary <span class="version-mark">从 v3.0.4 版本开始引入</span>
-
-系统表 [statement summary tables](/statement-summary-tables.md) 的相关配置。
-
-### max-stmt-count
-
-+ 系统表 [statement summary tables](/statement-summary-tables.md) 中保存的 SQL 种类的最大数量。
-+ 默认值：3000
-
-### max-sql-length
-
-+ 系统表 [statement summary tables](/statement-summary-tables.md) 中 `DIGEST_TEXT` 和 `QUERY_SAMPLE_TEXT` 列的最大显示长度。
-+ 默认值：4096
-
 ## pessimistic-txn
 
 悲观事务使用方法请参考 [TiDB 悲观事务模式](/pessimistic-transaction.md)。
@@ -741,4 +738,4 @@ experimental 部分为 TiDB 实验功能相关的配置。该部分从 v3.1.0 �
 
 + 用于设置 TiDB 统计信息同步加载功能最多可以缓存多少列的请求
 + 默认值：1000
-+ 目前的合法值范围： `[1, 100000]`
++ 目前的合法值范围：`[1, 100000]`
